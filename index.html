@@ -1,52 +1,52 @@
-!DOCTYPE html
-html lang=ru
-head
-  meta charset=UTF-8 
-  titleHTML Подменаtitle
-  style
-    body { font-family sans-serif; max-width 600px; margin 2rem auto; }
-    input, textarea { width 100%; padding 8px; margin 6px 0; }
-    button { padding 10px 20px; font-size 16px; }
-    #status { margin-top 1rem; font-weight bold; }
-  style
-head
-body
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>HTML Подмена</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
+    input, textarea { width: 100%; padding: 8px; margin: 6px 0; }
+    button { padding: 10px 20px; font-size: 16px; }
+    #status { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
 
-  h2Подмена HTMLh2
+  <h2>Подмена HTML</h2>
 
-  labelIP удалённого ПК (где PowerShell-прокси)label
-  input type=text id=target-ip placeholder=192.168.1.42 
+  <label>IP удалённого ПК (где PowerShell-прокси):</label>
+  <input type="text" id="target-ip" placeholder="192.168.1.42" />
 
-  labelЧасть URL для перехватаlabel
-  input type=text id=url placeholder=example.com 
+  <label>Часть URL для перехвата:</label>
+  <input type="text" id="url" placeholder="example.com" />
 
-  labelHTML-код для заменыlabel
-  textarea id=html rows=10 placeholder=h1Перехвачено!h1textarea
+  <label>HTML-код для замены:</label>
+  <textarea id="html" rows="10" placeholder="<h1>Перехвачено!</h1>"></textarea>
 
-  button onclick=send()Заменитьbutton
+  <button onclick="send()">Заменить</button>
 
-  div id=statusdiv
+  <div id="status"></div>
 
-  script
+  <script>
     function send() {
-      const ip = document.getElementById(target-ip).value;
-      const url = document.getElementById(url).value;
-      const html = document.getElementById(html).value;
+      const ip = document.getElementById("target-ip").value;
+      const url = document.getElementById("url").value;
+      const html = document.getElementById("html").value;
 
-      fetch(`http${ip}5000set`, {
-        method POST,
-        headers { Content-Type applicationjson },
-        body JSON.stringify({ url, html })
+      fetch(`http://${ip}:5000/set`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, html })
       })
-      .then(res = res.text())
-      .then(res = {
-        document.getElementById(status).innerText = ✅ Отправлено.;
+      .then(res => res.text())
+      .then(res => {
+        document.getElementById("status").innerText = "✅ Отправлено.";
       })
-      .catch(() = {
-        document.getElementById(status).innerText = ❌ Ошибка подключения.;
+      .catch(() => {
+        document.getElementById("status").innerText = "❌ Ошибка подключения.";
       });
     }
-  script
+  </script>
 
-body
-html
+</body>
+</html>
