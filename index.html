@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Панель управления подменой контента</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; }
+  label { display: block; margin-top: 15px; }
+  input[type=text], textarea { width: 100%; padding: 8px; font-size: 14px; }
+  button { margin-top: 15px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+  .status { margin-top: 20px; font-weight: bold; }
+</style>
+</head>
+<body>
+  <h1>Управление подменой контента</h1>
+
+  <label for="ip">IP сервера (оставь пустым — для всех):</label>
+  <input type="text" id="ip" placeholder="например, 192.168.1.10" />
+
+  <label for="url">Часть URL сайта для подмены (например example.com):</label>
+  <input type="text" id="url" placeholder="example.com" />
+
+  <label for="html">HTML-код для подмены страницы:</label>
+  <textarea id="html" rows="8" placeholder="Вставьте сюда HTML для подмены"></textarea>
+
+  <button id="enableBtn">Включить подмену</button>
+  <button id="disableBtn">Выключить подмену</button>
+
+  <div class="status" id="status"></div>
+
+<script>
+  const statusDiv = document.getElementById('status');
+  const ipInput = document.getElementById('ip');
+  const urlInput = document.getElementById('url');
+  const htmlInput = document.getElementById('html');
+  const enableBtn = document.getElementById('enableBtn');
+  const disableBtn = document.getElementById('disableBtn');
+
+  const apiBase = 'http://YOUR_PROXY_SERVER_IP:5000/control'; // <- сюда IP сервера
+
+  async function loadSettings() {
+    try {
+      const res = await fetch(apiBase);
+      const data = await res.json();
+      ipInput.value = data.allowed_ip || '';
+      urlInput.value = data.url || '';
+      htmlInput.value = data.enabled ? data.html || '' : '';
+      statusDiv.textContent = 'Статус: ' + (data.enabled ? 'Включено' : 'Выключено');
+    } catch (e) {
+      statusDiv.textContent = 'Ошибка загрузки настроек: ' + e.message;
+    }
+  }
+
+  enableBtn.onclick = async () => {
+    const payload = {
+      enabled: true,
+      url: urlInput.value,
+      html: htmlInput.value,
+      allowed_ip: ipInput.value || null
+    };
+    try {
+      const res = await fetch(apiBase, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        statusDiv.textContent = 'Подмена включена!';
+      } else {
+        statusDiv.textContent = 'Ошибка включения: ' + res.status;
+      }
+    } catch (e) {
+      statusDiv.textContent = 'Ошибка включения: ' + e.message;
+    }
+  };
+
+  disableBtn.onclick = async () => {
+    try {
+      const res = await fetch(apiBase, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({enabled:false})
+      });
+      if (res.ok) {
+        statusDiv.textContent = 'Подмена выключена!';
+      } else {
+        statusDiv.textContent = 'Ошибка выключения: ' + res.status;
+      }
+    } catch (e) {
+      statusDiv.textContent = 'Ошибка выключения: ' + e.message;
+    }
+  };
+
+  loadSettings();
+</script>
+</body>
+</html>
